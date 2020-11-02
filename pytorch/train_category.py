@@ -75,10 +75,12 @@ if __name__=='__main__':
 
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, classes)
+    model.fc = nn.Linear(num_ftrs, classes)  # fully connected n
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
-    device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
+    # device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
+    device = torch.device('cuda:0')
+    print(torch.cuda.is_available())
 
     train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size)
