@@ -62,7 +62,7 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.double() / dataset_size[phase]
 
-            info = 'epoch:{} {} - Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch, epoch_loss, epoch_acc)
+            info = 'epoch:{} {} - Loss: {:.4f} Acc: {:.4f}'.format(epoch, phase, epoch_loss, epoch_acc)
             logger.info(info)
             info_dict['phase'].append(phase)
             info_dict['epoch'].append(epoch)
