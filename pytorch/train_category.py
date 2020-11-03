@@ -93,7 +93,17 @@ if __name__=='__main__':
 
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
     num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, classes)  # fully connected n
+    model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
+
+    # freezer the ResNet34 layers
+    for name, value in model.named_parameters():
+        if (name != 'fc.weight') and (name != 'fc.bias'):
+            value.requires_grad = False
+
+    #打印各层的requires_grad属性
+    for name, param in model.named_parameters():
+        print(name, param.requires_grad)
+
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
