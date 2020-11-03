@@ -30,6 +30,16 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
     }
 
     for epoch in range(num_epochs):
+
+        if epoch == 15:
+            # unfreeze the ResNet34 layers
+            for name, value in model.named_parameters():
+                if (name != 'fc.weight') and (name != 'fc.bias'):
+                    value.requires_grad = True
+            # 打印各层的requires_grad属性
+            for name, param in model.named_parameters():
+                print(name, param.requires_grad)
+
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
 

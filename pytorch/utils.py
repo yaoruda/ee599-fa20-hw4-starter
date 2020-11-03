@@ -24,7 +24,7 @@ Config['meta_file'] = 'polyvore_item_metadata.json'
 
 Config['use_cuda'] = True
 Config['debug'] = False
-Config['num_epochs'] = 10
+Config['num_epochs'] = 20
 Config['batch_size'] = 128
 
 Config['learning_rate'] = 0.001
