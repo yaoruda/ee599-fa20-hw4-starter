@@ -13,6 +13,8 @@ from utils import Config
 from model import model
 from data import get_dataloader
 
+from logger import logger, logger_acc
+
 
 
 def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dataset_size):
@@ -20,6 +22,12 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
+    info_dict = {
+        'phase': [],
+        'epoch': [],
+        'loss': [],
+        'acc': [],
+    }
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
@@ -43,7 +51,6 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
                     outputs = model(inputs)
                     _, pred = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
-
                     if phase=='train':
                         loss.backward()
                         optimizer.step()
@@ -55,14 +62,25 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.double() / dataset_size[phase]
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+            info = 'epoch:{} {} - Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch, epoch_loss, epoch_acc)
+            logger.info(info)
+            info_dict['phase'].append(phase)
+            info_dict['epoch'].append(epoch)
+            info_dict['loss'].append(round(epoch_loss, 4))
+            info_dict['acc'].append(round(epoch_acc.item(), 4))
+            logger_acc.info(info_dict)
 
             if phase=='test' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
-        torch.save(best_model_wts, osp.join(Config['root_path'], Config['checkpoint_path'], 'model.pth'))
-        print('Model saved at: {}'.format(osp.join(Config['root_path'], Config['checkpoint_path'], 'model.pth')))
+        # same model for each epoch
+        model_name = 'model_epoch_{}.pth'.format(epoch)
+        torch.save(model.state_dict(), osp.join(Config['checkpoint_path'], model_name))
+        print('Model saved at: {}'.format(osp.join(Config['checkpoint_path'], model_name)))
+        # save best model
+        torch.save(best_model_wts, osp.join(Config['checkpoint_path'], 'best_model.pth'))
+        print('Best Model saved at: {}'.format(osp.join(Config['checkpoint_path'], 'best_model.pth')))
 
     time_elapsed = time.time() - since
     print('Time taken to complete training: {:0f}m {:0f}s'.format(time_elapsed // 60, time_elapsed % 60))
@@ -73,14 +91,22 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
 if __name__=='__main__':
 
+    a = {'phase': ['train', 'test'], 'epoch': [0, 0], 'loss': [0.004006753650251644, 4264095.478586511],
+     'acc': [4.979930878559406e-06, 7.967810047408469e-05]}
+    print(a)
+
+
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, classes)  # fully connected n
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
-    # device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
-    device = torch.device('cuda:0')
-    print(torch.cuda.is_available())
+    device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
+
+    if torch.cuda.is_available():
+        print("USE GPU")
+    else:
+        print("USE CPU")
 
     train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size)

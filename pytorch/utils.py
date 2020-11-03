@@ -4,15 +4,23 @@ import os.path as osp
 import argparse
 
 Config ={}
-Config['root_path'] = '/home/ubuntu/dataset/polyvore_outfits'
+
+local = False
+
+if local:
+    Config['root_path'] = '/Users/yaoruda/Documents/Labs/data/polyvore_outfits'
+    Config['checkpoint_path'] = '/Users/yaoruda/Documents/Labs/data/models'
+else:
+    Config['root_path'] = '/polyvore_outfits'
+    Config['checkpoint_path'] = '/models'
+
 Config['meta_file'] = 'polyvore_item_metadata.json'
-Config['checkpoint_path'] = ''
 
 
 Config['use_cuda'] = True
-Config['debug'] = False
+Config['debug'] = True
 Config['num_epochs'] = 2
-Config['batch_size'] = 64
+Config['batch_size'] = 32
 
 Config['learning_rate'] = 0.001
 Config['num_workers'] = 5
