@@ -31,14 +31,15 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
     for epoch in range(num_epochs):
 
-        if epoch == 15:
-            # unfreeze the ResNet34 layers
-            for name, value in model.named_parameters():
-                if (name != 'fc.weight') and (name != 'fc.bias'):
-                    value.requires_grad = True
-            # 打印各层的requires_grad属性
-            for name, param in model.named_parameters():
-                print(name, param.requires_grad)
+        if Config['half_finetune']:
+            if epoch == 15:
+                # unfreeze the ResNet34 layers
+                for name, value in model.named_parameters():
+                    if (name != 'fc.weight') and (name != 'fc.bias'):
+                        value.requires_grad = True
+                # 打印各层的requires_grad属性
+                for name, param in model.named_parameters():
+                    print(name, param.requires_grad)
 
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
         print('-' * 10)
@@ -105,14 +106,16 @@ if __name__=='__main__':
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
 
-    # freezer the ResNet34 layers
-    for name, value in model.named_parameters():
-        if (name != 'fc.weight') and (name != 'fc.bias'):
-            value.requires_grad = False
 
-    #打印各层的requires_grad属性
-    for name, param in model.named_parameters():
-        print(name, param.requires_grad)
+    if Config['half_finetune']:
+        # freeze the ResNet34 layers
+        for name, value in model.named_parameters():
+            if (name != 'fc.weight') and (name != 'fc.bias'):
+                value.requires_grad = False
+
+        #打印各层的requires_grad属性
+        for name, param in model.named_parameters():
+            print(name, param.requires_grad)
 
 
     criterion = nn.CrossEntropyLoss()
