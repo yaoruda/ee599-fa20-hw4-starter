@@ -12,7 +12,7 @@ if local:
     Config['checkpoint_path'] = '/Users/yaoruda/Documents/Labs/data/models'
 else:
     Config['root_path'] = '/root/data/polyvore_outfits'
-    Config['checkpoint_path'] = '/root/ee599-fa20-hw4-starter/models'
+    Config['checkpoint_path'] = '/home/ec2-user/ee599-fa20-hw4-starter/models'
 
 Config['meta_file'] = 'polyvore_item_metadata.json'
 

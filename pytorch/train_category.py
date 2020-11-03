@@ -91,11 +91,6 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
 if __name__=='__main__':
 
-    a = {'phase': ['train', 'test'], 'epoch': [0, 0], 'loss': [0.004006753650251644, 4264095.478586511],
-     'acc': [4.979930878559406e-06, 7.967810047408469e-05]}
-    print(a)
-
-
     dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, classes)  # fully connected n
