@@ -44,13 +44,13 @@ class Ruda_Model(nn.Module):
         self.conv5_2 = nn.Conv2d(256, 256, 3, padding=1)
         self.bn5_1 = nn.BatchNorm2d(256)
         self.bn5_2 = nn.BatchNorm2d(256)
-        # self.pool4 = nn.MaxPool2d(kernel_size=2, dilation=2)
-        self.pool5 = nn.MaxPool2d(kernel_size=2)
+        self.pool5 = nn.MaxPool2d(kernel_size=2, dilation=2)
+        # self.pool5 = nn.MaxPool2d(kernel_size=2)
 
         self.dropout_conv = nn.Dropout2d(0.1)
         self.dropout_fc = nn.Dropout2d(0.5)
 
-        self.fc1 = nn.Linear(256 * 5 * 5, 2048)
+        self.fc1 = nn.Linear(256 * 6 * 6, 2048)
         self.fc2 = nn.Linear(2048, 2048)
         self.fc3 = nn.Linear(2048, 153)
 
@@ -103,7 +103,7 @@ class Ruda_Model(nn.Module):
 
         # flatten
         # print(out.shape)
-        out = out.view(-1, 256 * 5 * 5)
+        out = out.view(-1, 256 * 6 * 6)
 
 
 
