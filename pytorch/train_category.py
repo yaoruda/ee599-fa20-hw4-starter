@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
+from torchsummary import summary
 
 import argparse
 import time
@@ -107,7 +107,8 @@ if __name__ == '__main__':
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
 
-    print(model)
+    # print(model)
+    summary(model, input_size=(3, 224, 224))
 
 
     if Config['half_finetune']:
