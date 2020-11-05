@@ -9,6 +9,17 @@ Config ={}
 
 local = False
 TX = False
+Config['debug'] = False
+Config['finetune'] = False
+Config['half_finetune'] = False
+Config['ruda_model'] = True
+
+Config['num_epochs'] = 20
+Config['batch_size'] = 128
+Config['learning_rate'] = 0.001
+Config['num_workers'] = 5
+
+Config['use_cuda'] = True
 
 if local:
     Config['root_path'] = '/Users/yaoruda/Documents/Labs/data/polyvore_outfits'
@@ -24,14 +35,5 @@ else:
 
 Config['meta_file'] = 'polyvore_item_metadata.json'
 
-Config['finetune'] = False
-Config['half_finetune'] = False
 
-Config['use_cuda'] = True
-Config['debug'] = False
-Config['num_epochs'] = 20
-Config['batch_size'] = 128
-
-Config['learning_rate'] = 0.001
-Config['num_workers'] = 5
 

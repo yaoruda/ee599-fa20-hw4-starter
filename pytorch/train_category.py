@@ -10,11 +10,10 @@ from tqdm import tqdm
 import os.path as osp
 
 from utils import Config
-from model import model
+from model import torch_model, Ruda_Model
 from data import get_dataloader
 
 from logger import logger, logger_acc
-
 
 
 def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dataset_size):
@@ -37,7 +36,6 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
                 for name, value in model.named_parameters():
                     if (name != 'fc.weight') and (name != 'fc.bias'):
                         value.requires_grad = True
-                # 打印各层的requires_grad属性
                 for name, param in model.named_parameters():
                     print(name, param.requires_grad)
 
@@ -45,7 +43,7 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
         print('-' * 10)
 
         for phase in ['train', 'test']:
-            if phase=='train':
+            if phase == 'train':
                 model.train()
             else:
                 model.eval()
@@ -58,17 +56,16 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
                 labels = labels.to(device)
                 optimizer.zero_grad()
 
-                with torch.set_grad_enabled(phase=='train'):
+                with torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     _, pred = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
-                    if phase=='train':
+                    if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
-
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(pred==labels.data)
+                running_corrects += torch.sum(pred == labels.data)
 
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.double() / dataset_size[phase]
@@ -81,7 +78,7 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             info_dict['acc'].append(round(epoch_acc.item(), 4))
             logger_acc.info(info_dict)
 
-            if phase=='test' and epoch_acc > best_acc:
+            if phase == 'test' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
@@ -98,13 +95,19 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
     print('Best acc: {:.4f}'.format(best_acc))
 
 
+if __name__ == '__main__':
 
+    dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'],
+                                                        num_workers=Config['num_workers'])
 
-if __name__=='__main__':
+    if Config['ruda_model']:
+        model = Ruda_Model()
+    else:
+        model = torch_model
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
 
-    dataloaders, classes, dataset_size = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'], num_workers=Config['num_workers'])
-    num_ftrs = model.fc.in_features
-    model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
+    print(model)
 
 
     if Config['half_finetune']:
@@ -113,10 +116,8 @@ if __name__=='__main__':
             if (name != 'fc.weight') and (name != 'fc.bias'):
                 value.requires_grad = False
 
-        #打印各层的requires_grad属性
         for name, param in model.named_parameters():
             print(name, param.requires_grad)
-
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
@@ -127,4 +128,5 @@ if __name__=='__main__':
     else:
         print("USE CPU")
 
-    train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'], dataset_size=dataset_size)
+    train_model(dataloaders, model, criterion, optimizer, device, num_epochs=Config['num_epochs'],
+                dataset_size=dataset_size)
