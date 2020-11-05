@@ -14,7 +14,7 @@ Config['finetune'] = False
 Config['half_finetune'] = False
 Config['ruda_model'] = True
 
-Config['num_epochs'] = 20
+Config['num_epochs'] = 10
 Config['batch_size'] = 128
 Config['learning_rate'] = 0.001
 Config['num_workers'] = 5
