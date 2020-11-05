@@ -38,12 +38,12 @@ class Ruda_Model(nn.Module):
         self.bn4_1 = nn.BatchNorm2d(512)
         self.bn4_2 = nn.BatchNorm2d(512)
         # self.pool4 = nn.MaxPool2d(kernel_size=2, dilation=2)
-        self.pool4 = nn.MaxPool2d(kernel_size=4)
+        self.pool4 = nn.MaxPool2d(kernel_size=2)
 
         self.dropout = nn.Dropout2d(0.25)
 
-        self.fc1 = nn.Linear(512 * 7 * 7, 153)
-        # self.fc2 = nn.Linear(1024, 512)
+        self.fc1 = nn.Linear(512 * 14 * 14, 1024)
+        self.fc2 = nn.Linear(1024, 153)
         # self.fc3 = nn.Linear(512, 153)
 
     def forward(self, x):
@@ -59,7 +59,7 @@ class Ruda_Model(nn.Module):
         out = self.bn1_2(out)
         out = F.relu(out)
         out = self.pool1(out)
-        out = self.dropout(out)
+        # out = self.dropout(out)
 
         out = self.conv2_1(out)
         out = self.bn2_1(out)
@@ -67,7 +67,7 @@ class Ruda_Model(nn.Module):
         out = self.bn2_2(out)
         out = F.relu(out)
         out = self.pool2(out)
-        out = self.dropout(out)
+        # out = self.dropout(out)
 
         out = self.conv3_1(out)
         out = self.bn3_1(out)
@@ -75,7 +75,7 @@ class Ruda_Model(nn.Module):
         out = self.bn3_2(out)
         out = F.relu(out)
         out = self.pool3(out)
-        out = self.dropout(out)
+        # out = self.dropout(out)
 
         out = self.conv4_1(out)
         out = self.bn4_1(out)
@@ -83,17 +83,18 @@ class Ruda_Model(nn.Module):
         out = self.bn4_2(out)
         out = F.relu(out)
         out = self.pool4(out)
+
         out = self.dropout(out)
 
         # flatten
-        print(out.shape)
+        # print(out.shape)
 
-        out = out.view(-1, 512 * 7 * 7)
+        out = out.view(-1, 512 * 14 * 14)
 
 
 
         out = self.fc1(out)
-        # out = self.fc2(out)
+        out = self.fc2(out)
         # out = self.fc3(out)
 
         # out = F.sigmoid(out)
