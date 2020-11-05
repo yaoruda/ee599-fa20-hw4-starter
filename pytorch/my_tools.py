@@ -10,7 +10,7 @@ from tqdm import tqdm
 import os.path as osp
 
 # model = MyNetwork().to(device)
-model = torch.load(torch.load('/home/ubuntu/ee599-fa20-hw4-starter/models/best_model.pth'))
+model = torch.load('/home/ubuntu/ee599-fa20-hw4-starter/models/best_model.pth')
 torch.save(model, '/home/ubuntu/ee599-fa20-hw4-starter/models/test_model.pth', _use_new_zipfile_serialization=False)
 print('success!')
 
