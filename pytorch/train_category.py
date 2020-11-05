@@ -17,7 +17,7 @@ from logger import logger, logger_acc
 
 
 def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dataset_size):
-
+    model.to(device)
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -107,10 +107,8 @@ if __name__ == '__main__':
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
-    model.to(device)
-    # print(model)
-    summary(model, input_size=(3, 224, 224))
+    print(model)
+    # summary(model, input_size=(3, 224, 224))
 
 
     if Config['half_finetune']:
@@ -124,6 +122,7 @@ if __name__ == '__main__':
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
+    device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
 
     if torch.cuda.is_available():
         print("USE GPU")
