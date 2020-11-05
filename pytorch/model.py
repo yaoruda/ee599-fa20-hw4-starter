@@ -49,9 +49,9 @@ class Ruda_Model(nn.Module):
 
         self.dropout = nn.Dropout2d(0.1)
 
-        self.fc1 = nn.Linear(256 * 5 * 5, 2048)
-        self.fc2 = nn.Linear(2048, 2048)
-        self.fc3 = nn.Linear(2048, 153)
+        self.fc1 = nn.Linear(256 * 5 * 5, 153)
+        # self.fc2 = nn.Linear(2048, 2048)
+        # self.fc3 = nn.Linear(2048, 153)
 
     def forward(self, x):
         out = x
@@ -107,7 +107,7 @@ class Ruda_Model(nn.Module):
 
 
         out = self.fc1(out)
-        out = self.fc2(out)
+        # out = self.fc2(out)
         # out = self.fc3(out)
 
         # out = F.sigmoid(out)
