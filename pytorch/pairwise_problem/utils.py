@@ -3,20 +3,21 @@ import os
 import os.path as osp
 import argparse
 
+# CHECK:::: Local TX finetuneX2 debug
 
 Config ={}
 
-local = False
-TX = True
-Config['debug'] = False
+local = True
+TX = False
+Config['debug'] = True
 Config['finetune'] = False
 Config['half_finetune'] = False
 Config['ruda_model'] = True
 
-Config['num_epochs'] = 20
+Config['num_epochs'] = 1
 Config['batch_size'] = 64
 Config['learning_rate'] = 0.001
-Config['num_workers'] = 8
+Config['num_workers'] = 5
 
 Config['use_cuda'] = True
 
