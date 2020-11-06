@@ -177,11 +177,11 @@ def get_dataloader(debug, batch_size, num_workers):
     if debug==True:
         train_set = polyvore_train(X_train[:100], y_train[:100], transform=transforms['train'])
         test_set = polyvore_test(X_test[:100], y_test[:100], transform=transforms['test'])
-        dataset_size = {'train': len(y_train), 'test': len(y_test)}
+        dataset_size = {'train': len(y_train[:100]), 'test': len(y_test[:100])}
     else:
-        train_set = polyvore_train(X_train, y_train, transforms['train'])
-        test_set = polyvore_test(X_test, y_test, transforms['test'])
-        dataset_size = {'train': len(y_train), 'test': len(y_test)}
+        train_set = polyvore_train(X_train[:100000], y_train[:100000], transforms['train'])
+        test_set = polyvore_test(X_test[:100000], y_test[:100000], transforms['test'])
+        dataset_size = {'train': len(y_train[:100000]), 'test': len(y_test[:100000])}
 
     datasets = {'train': train_set, 'test': test_set}
     dataloaders = {x: DataLoader(datasets[x],
