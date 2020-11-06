@@ -19,8 +19,7 @@ from logger import logger, logger_acc
 def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dataset_size):
 
     since = time.time()
-    # best_model_wts = copy.deepcopy(model.state_dict())
-    best_model_wts = copy.deepcopy(model)
+    best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
     info_dict = {
         'phase': [],
@@ -84,18 +83,14 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
             if phase == 'test' and epoch_acc > best_acc:
                 best_acc = epoch_acc
-                # best_model_wts = copy.deepcopy(model.state_dict())
-                best_model_wts = copy.deepcopy(model)
+                best_model_wts = copy.deepcopy(model.state_dict())
 
         # same model for each epoch
         model_name = 'model_epoch_{}.pth'.format(epoch)
         torch.save(model.state_dict(), osp.join(Config['checkpoint_path'], model_name))
         print('Model saved at: {}'.format(osp.join(Config['checkpoint_path'], model_name)))
         # save best model
-        torch.save({
-            'model': best_model_wts,
-            'label': dataset.labels.classes_
-        }, osp.join(Config['checkpoint_path'], 'best_model.pth'))
+        torch.save(best_model_wts, osp.join(Config['checkpoint_path'], 'best_model.pth'))
         print('Best Model saved at: {}'.format(osp.join(Config['checkpoint_path'], 'best_model.pth')))
 
     time_elapsed = time.time() - since

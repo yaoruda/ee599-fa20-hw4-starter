@@ -101,7 +101,7 @@ class Ruda_Model(nn.Module):
         # out = self.dropout(out)
 
         # flatten
-        print(out.shape)
+        # print(out.shape)
         out = out.view(-1, 64 * 28 * 28)
 
 
