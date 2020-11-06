@@ -51,7 +51,7 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             running_loss = 0.0
             running_corrects = 0
 
-            for inputs, labels in dataloaders[phase]:
+            for inputs, labels in tqdm(dataloaders[phase]):
                 inputs = inputs.to(device)
                 labels = labels.to(device)
                 optimizer.zero_grad()
