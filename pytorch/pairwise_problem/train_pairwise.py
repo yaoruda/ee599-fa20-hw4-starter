@@ -123,7 +123,7 @@ if __name__ == '__main__':
         for name, param in model.named_parameters():
             print(name, param.requires_grad)
 
-    criterion = nn.BCELoss()
+    criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
 
 
