@@ -7,16 +7,16 @@ import argparse
 
 Config ={}
 
-local = True
-TX = False
+local = False
+TX = True
 Config['debug'] = True
 Config['finetune'] = False
 Config['half_finetune'] = False
 Config['ruda_model'] = True
 
-Config['num_epochs'] = 1
-Config['batch_size'] = 32
-Config['learning_rate'] = 0.001
+Config['num_epochs'] = 2
+Config['batch_size'] = 64
+Config['learning_rate'] = 0.002
 Config['num_workers'] = 8
 
 Config['use_cuda'] = True
