@@ -11,7 +11,7 @@ import os.path as osp
 
 from utils import Config
 from model import torch_model, Ruda_Model
-from data import get_dataloader
+from data_pairwise import get_dataloader
 
 from logger import logger, logger_acc
 
@@ -52,7 +52,7 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
             running_loss = 0.0
             running_corrects = 0
 
-            for inputs, labels in tqdm(dataloaders[phase]):
+            for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
                 optimizer.zero_grad()
@@ -102,20 +102,16 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
 if __name__ == '__main__':
 
-    dataloaders, classes, dataset_size, dataset = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'],
+    dataloaders, dataset_size, dataset = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'],
                                                         num_workers=Config['num_workers'])
 
-    if Config['ruda_model']:
-        model = Ruda_Model()
-    else:
-        model = torch_model
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, classes)  # repleace the fc layer to fit this problem
+    model = Ruda_Model()
+
 
     # print(model)
     device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
     model.to(device)
-    summary(model, input_size=(3, 224, 224))
+    summary(model, input_size=(6, 224, 224))
 
 
     if Config['half_finetune']:
@@ -127,7 +123,7 @@ if __name__ == '__main__':
         for name, param in model.named_parameters():
             print(name, param.requires_grad)
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.BCELoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
 
 

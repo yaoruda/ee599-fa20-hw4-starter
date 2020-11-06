@@ -10,12 +10,12 @@ local = False
 TX = True
 Config['debug'] = False
 Config['finetune'] = False
-Config['half_finetune'] = False
-Config['ruda_model'] = True
+Config['half_finetune'] = True
+Config['ruda_model'] = False
 
-Config['num_epochs'] = 20
-Config['batch_size'] = 64
-Config['learning_rate'] = 0.001
+Config['num_epochs'] = 30
+Config['batch_size'] = 256
+Config['learning_rate'] = 0.005
 Config['num_workers'] = 8
 
 Config['use_cuda'] = True

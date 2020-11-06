@@ -22,8 +22,12 @@ class polyvore_dataset:
     def __init__(self):
         self.root_dir = Config['root_path']
         self.image_dir = osp.join(self.root_dir, 'images')
+        self.train_dir = osp.join(self.root_dir, 'compatibility_train.txt')
+        self.valid_dir = osp.join(self.root_dir, 'compatibility_valid.txt')
+        self.train_json = osp.join(self.root_dir, 'train.json')
+        self.valid_json = osp.join(self.root_dir, 'valid.json')
         self.transforms = self.get_data_transforms()
-        self.labels = LabelEncoder()
+        # self.labels = LabelEncoder()
         # self.y = self.labels.fit_transform(self.y)
         # self.X_train, self.X_test, self.y_train, self.y_test, self.classes = self.create_dataset()
 
@@ -48,31 +52,74 @@ class polyvore_dataset:
 
 
     def create_dataset(self):
-        # map id to category
-        meta_file = open(osp.join(self.root_dir, Config['meta_file']), 'r')
-        meta_json = json.load(meta_file)
-        id_to_category = {}
-        for k, v in tqdm(meta_json.items()):
-            id_to_category[k] = v['category_id']
+        # train_json
+        meta_file = open(osp.join(self.root_dir, self.train_json), 'r')
+        train_json = json.load(meta_file)
+        set_id_to_item_id_train = {}
+        for set in train_json:
+            set_id_to_item_id_train[set['set_id']] = []
+            for item in set['items']:
+                set_id_to_item_id_train[set['set_id']].append(item['item_id'])
+        # valid_json
+        meta_file = open(osp.join(self.root_dir, self.valid_json), 'r')
+        valid_json = json.load(meta_file)
+        set_id_to_item_id_valid = {}
+        for set in valid_json:
+            set_id_to_item_id_valid[set['set_id']] = []
+            for item in set['items']:
+                set_id_to_item_id_valid[set['set_id']].append(item['item_id'])
 
-        # create X, y pairs
-        files = os.listdir(self.image_dir)
-        X = []; y = []
-        for x in files:
-            if x[:-4] in id_to_category:
-                X.append(x)
-                y.append(int(id_to_category[x[:-4]]))
+        X_train = []
+        y_train = []
+        X_val = []
+        y_val = []
+        for line in open(self.train_dir, "r"):  # train data
+            line = line.rstrip("\n")
+            label, items = line.split(' ', 1)
+            items = items.lstrip()
+            if len(items.split(' ')) < 2:
+                print(items)
+                continue
+            else:
+                this_comp_items = []
+                for item in items.split(' '):
+                    set_id, index = item.split('_')
+                    item_id = set_id_to_item_id_train[set_id][int(index)-1]
+                    this_comp_items.append(item_id)
+                X_train.append(this_comp_items)
+                y_train.append(int(label))
 
-        y = self.labels.fit_transform(y)
-        print('len of X: {}, # of categories: {}'.format(len(X), max(y) + 1))
+        for line in open(self.valid_dir, "r"):  # validation data
+            line = line.rstrip("\n")
+            label, items = line.split(' ', 1)
+            items = items.lstrip()
+            if len(items.split(' ')) < 2:
+                print(items)
+                continue
+            else:
+                this_comp_items = []
+                for item in items.split(' '):
+                    this_comp_items.append(item.split('_'))
+                i = 0
+                while i < len(this_comp_items):
+                    j = i
+                    while j < len(this_comp_items):
+                        set_id, index = this_comp_items[i][0], this_comp_items[i][1]
+                        x1 = set_id_to_item_id_valid[set_id][int(index)-1]
+                        x2 = set_id_to_item_id_valid[set_id][int(index)-1]
+                        j += 1
+                    i += 1
+                    X_val.append([x1, x2])
+                    y_val.append(int(label))
 
-        # split dataset
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        return X_train, X_test, y_train, y_test, max(y) + 1
+        print('len of train: {}, # len of val: {}'.format(len(y_train), len(y_val)))
+
+        return X_train, X_val, torch.tensor(y_train), torch.tensor(y_val)
 
 
+########################################################################
+# For Pairwise Compatibility Classification
 
-# For category classification
 class polyvore_train(Dataset):
     def __init__(self, X_train, y_train, transform):
         self.X_train = X_train
@@ -84,11 +131,12 @@ class polyvore_train(Dataset):
         return len(self.X_train)
 
     def __getitem__(self, item):
-        file_path = osp.join(self.image_dir, self.X_train[item])
-        return self.transform(Image.open(file_path)),self.y_train[item]
-
-
-
+        file_path = osp.join(self.image_dir, self.X_train[item][0])
+        X1 = self.transform(Image.open(file_path+'.jpg'))
+        file_path = osp.join(self.image_dir, self.X_train[item][1])
+        X2 = self.transform(Image.open(file_path+'.jpg'))
+        X = torch.cat((X1, X2), 1)
+        return X, self.y_train[item]
 
 class polyvore_test(Dataset):
     def __init__(self, X_test, y_test, transform):
@@ -96,15 +144,15 @@ class polyvore_test(Dataset):
         self.y_test = y_test
         self.transform = transform
         self.image_dir = osp.join(Config['root_path'], 'images')
-
-
     def __len__(self):
         return len(self.X_test)
-
-
     def __getitem__(self, item):
-        file_path = osp.join(self.image_dir, self.X_test[item])
-        return self.transform(Image.open(file_path)), self.y_test[item]
+        file_path = osp.join(self.image_dir, self.X_test[item][0])
+        X1 = self.transform(Image.open(file_path+'.jpg'))
+        file_path = osp.join(self.image_dir, self.X_test[item][1])
+        X2 = self.transform(Image.open(file_path+'.jpg'))
+        X = torch.cat((X1, X2), 1)
+        return X, self.y_test[item]
 
 
 
@@ -112,7 +160,7 @@ class polyvore_test(Dataset):
 def get_dataloader(debug, batch_size, num_workers):
     dataset = polyvore_dataset()
     transforms = dataset.get_data_transforms()
-    X_train, X_test, y_train, y_test, classes = dataset.create_dataset()
+    X_train, X_test, y_train, y_test = dataset.create_dataset()
 
     if debug==True:
         train_set = polyvore_train(X_train[:100], y_train[:100], transform=transforms['train'])
@@ -126,14 +174,7 @@ def get_dataloader(debug, batch_size, num_workers):
     datasets = {'train': train_set, 'test': test_set}
     dataloaders = {x: DataLoader(datasets[x],
                                  shuffle=True if x=='train' else False,
-                                 batch_size=batch_size,
-                                 num_workers=num_workers)
+                                 batch_size=batch_size)
                                  for x in ['train', 'test']}
-    return dataloaders, classes, dataset_size, dataset
-
-
-
-
-########################################################################
-# For Pairwise Compatibility Classification
+    return dataloaders, dataset_size, dataset
 
