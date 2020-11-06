@@ -14,8 +14,8 @@ Config['half_finetune'] = False
 Config['ruda_model'] = False
 
 Config['num_epochs'] = 30
-Config['batch_size'] = 1000
-Config['learning_rate'] = 0.002
+Config['batch_size'] = 512
+Config['learning_rate'] = 0.003
 Config['num_workers'] = 8
 
 Config['use_cuda'] = True
