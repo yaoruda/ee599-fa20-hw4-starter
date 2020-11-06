@@ -59,14 +59,17 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
 
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
-                    _, pred = torch.max(outputs, 1)
+                    labels = labels.unsqueeze(1).double()
+                    # _, pred = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
+                # running_loss += loss.item() * inputs.size(0)
+                # running_corrects += torch.sum(pred == labels.data)
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(pred == labels.data)
+                running_corrects += torch.sum(torch.eq(outputs > 0, labels).long())
 
             epoch_loss = running_loss / dataset_size[phase]
             epoch_acc = running_corrects.double() / dataset_size[phase]
