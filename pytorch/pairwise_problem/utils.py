@@ -9,7 +9,7 @@ Config ={}
 
 local = False
 TX = True
-Config['debug'] = True
+Config['debug'] = False
 Config['finetune'] = False
 Config['half_finetune'] = False
 Config['ruda_model'] = True
