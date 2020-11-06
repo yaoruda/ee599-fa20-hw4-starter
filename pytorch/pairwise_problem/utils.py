@@ -16,7 +16,7 @@ Config['ruda_model'] = True
 
 Config['num_epochs'] = 30
 Config['batch_size'] = 256
-Config['learning_rate'] = 0.002
+Config['learning_rate'] = 0.0015
 Config['num_workers'] = 8
 
 Config['use_cuda'] = True
