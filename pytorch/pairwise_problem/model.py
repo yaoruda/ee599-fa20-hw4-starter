@@ -17,11 +17,11 @@ class Ruda_Model(nn.Module):
     def __init__(self):
         super(Ruda_Model, self).__init__()
 
-        self.conv1_1 = nn.Conv2d(6, 64, 3, padding=1)
-        self.conv1_2 = nn.Conv2d(64, 64, 3, padding=1)
-        self.bn1_1 = nn.BatchNorm2d(64)
-        self.bn1_2 = nn.BatchNorm2d(64)
-        self.pool1 = nn.MaxPool2d(kernel_size=2)
+        self.conv1_1 = nn.Conv2d(6, 24, 3, stride=2, padding=1, bias=False)
+        self.conv1_2 = nn.Conv2d(24, 48, 3, stride=2, padding=1, bias=False)
+        self.bn1_1 = nn.BatchNorm2d(24)
+        self.bn1_2 = nn.BatchNorm2d(48)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, dilation=2)
 
         self.conv2_1 = nn.Conv2d(64, 128, 3, padding=1)
         self.conv2_2 = nn.Conv2d(128, 128, 3, padding=1)
@@ -51,8 +51,8 @@ class Ruda_Model(nn.Module):
 
         self.dropout = nn.Dropout2d(0.1)
 
-        self.fc1 = nn.Linear(64 * 28 * 28, 1024)
-        self.fc2 = nn.Linear(1024, 1)
+        self.fc1 = nn.Linear(48 * 27 * 27, 1)
+        # self.fc2 = nn.Linear(1024, 1)
         # self.fc3 = nn.Linear(2048, 153)
 
 
@@ -68,21 +68,21 @@ class Ruda_Model(nn.Module):
         out = F.relu(out)
         out = self.dropout(out)
 
-        out = self.conv2_1(out)
-        out = self.bn2_1(out)
-        out = self.conv2_2(out)
-        out = self.bn2_2(out)
-        out = self.pool2(out)
-        out = F.relu(out)
-        out = self.dropout(out)
-
-        out = self.conv3_1(out)
-        out = self.bn3_1(out)
-        out = self.conv3_2(out)
-        out = self.bn3_2(out)
-        out = self.pool3(out)
-        out = F.relu(out)
-        out = self.dropout(out)
+        # out = self.conv2_1(out)
+        # out = self.bn2_1(out)
+        # out = self.conv2_2(out)
+        # out = self.bn2_2(out)
+        # out = self.pool2(out)
+        # out = F.relu(out)
+        # out = self.dropout(out)
+        #
+        # out = self.conv3_1(out)
+        # out = self.bn3_1(out)
+        # out = self.conv3_2(out)
+        # out = self.bn3_2(out)
+        # out = self.pool3(out)
+        # out = F.relu(out)
+        # out = self.dropout(out)
 
         # out = self.conv4_1(out)
         # out = self.bn4_1(out)
@@ -102,12 +102,12 @@ class Ruda_Model(nn.Module):
 
         # flatten
         # print(out.shape)
-        out = out.view(-1, 64 * 28 * 28)
+        out = out.view(-1, 48 * 27 * 27)
 
 
 
         out = self.fc1(out)
-        out = self.fc2(out)
+        # out = self.fc2(out)
         # out = self.fc3(out)
 
         # out = F.sigmoid(out)
