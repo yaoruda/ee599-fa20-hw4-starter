@@ -51,7 +51,7 @@ class Ruda_Model(nn.Module):
 
         self.dropout = nn.Dropout2d(0.1)
 
-        self.fc1 = nn.Linear(64 * 23 * 23, 1024)
+        self.fc1 = nn.Linear(64 * 28 * 28, 1024)
         self.fc2 = nn.Linear(1024, 2)
         # self.fc3 = nn.Linear(2048, 153)
 
@@ -102,7 +102,7 @@ class Ruda_Model(nn.Module):
 
         # flatten
         print(out.shape)
-        out = out.view(-1, 64 * 23 * 23)
+        out = out.view(-1, 64 * 28 * 28)
 
 
 

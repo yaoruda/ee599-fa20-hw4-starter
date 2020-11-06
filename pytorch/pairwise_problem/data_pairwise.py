@@ -83,11 +83,20 @@ class polyvore_dataset:
             else:
                 this_comp_items = []
                 for item in items.split(' '):
-                    set_id, index = item.split('_')
-                    item_id = set_id_to_item_id_train[set_id][int(index)-1]
-                    this_comp_items.append(item_id)
-                X_train.append(this_comp_items)
-                y_train.append(int(label))
+                    this_comp_items.append(item.split('_'))
+                i = 0
+                while i < len(this_comp_items):
+                    j = i
+                    while j < len(this_comp_items):
+                        if i != j:
+                            set_id, index = this_comp_items[i][0], this_comp_items[i][1]
+                            x1 = set_id_to_item_id_train[set_id][int(index) - 1]
+                            set_id, index = this_comp_items[j][0], this_comp_items[j][1]
+                            x2 = set_id_to_item_id_train[set_id][int(index) - 1]
+                            X_train.append([x1, x2])
+                            y_train.append(int(label))
+                        j += 1
+                    i += 1
 
         for line in open(self.valid_dir, "r"):  # validation data
             line = line.rstrip("\n")
@@ -104,13 +113,16 @@ class polyvore_dataset:
                 while i < len(this_comp_items):
                     j = i
                     while j < len(this_comp_items):
-                        set_id, index = this_comp_items[i][0], this_comp_items[i][1]
-                        x1 = set_id_to_item_id_valid[set_id][int(index)-1]
-                        x2 = set_id_to_item_id_valid[set_id][int(index)-1]
+                        if i != j:
+                            set_id, index = this_comp_items[i][0], this_comp_items[i][1]
+                            x1 = set_id_to_item_id_valid[set_id][int(index)-1]
+                            set_id, index = this_comp_items[j][0], this_comp_items[j][1]
+                            x2 = set_id_to_item_id_valid[set_id][int(index)-1]
+                            X_val.append([x1, x2])
+                            y_val.append(int(label))
                         j += 1
                     i += 1
-                    X_val.append([x1, x2])
-                    y_val.append(int(label))
+
 
         print('len of train: {}, # len of val: {}'.format(len(y_train), len(y_val)))
 
@@ -135,7 +147,7 @@ class polyvore_train(Dataset):
         X1 = self.transform(Image.open(file_path+'.jpg'))
         file_path = osp.join(self.image_dir, self.X_train[item][1])
         X2 = self.transform(Image.open(file_path+'.jpg'))
-        X = torch.cat((X1, X2), 1)
+        X = torch.cat((X1, X2), 0)
         return X, self.y_train[item]
 
 class polyvore_test(Dataset):
@@ -151,7 +163,7 @@ class polyvore_test(Dataset):
         X1 = self.transform(Image.open(file_path+'.jpg'))
         file_path = osp.join(self.image_dir, self.X_test[item][1])
         X2 = self.transform(Image.open(file_path+'.jpg'))
-        X = torch.cat((X1, X2), 1)
+        X = torch.cat((X1, X2), 0)
         return X, self.y_test[item]
 
 

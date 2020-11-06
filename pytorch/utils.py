@@ -9,13 +9,13 @@ Config ={}
 local = False
 TX = True
 Config['debug'] = False
-Config['finetune'] = False
+Config['finetune'] = True
 Config['half_finetune'] = True
 Config['ruda_model'] = False
 
 Config['num_epochs'] = 30
-Config['batch_size'] = 256
-Config['learning_rate'] = 0.005
+Config['batch_size'] = 8000
+Config['learning_rate'] = 0.01
 Config['num_workers'] = 8
 
 Config['use_cuda'] = True
