@@ -17,6 +17,9 @@ from PIL import Image
 
 from utils import Config
 
+TRAIN_SIZE = 100000
+VAL_SIZE = 10000
+
 
 class polyvore_dataset:
     def __init__(self):
@@ -69,10 +72,14 @@ class polyvore_dataset:
             for item in set['items']:
                 set_id_to_item_id_valid[set['set_id']].append(item['item_id'])
 
-        X_train = []
-        y_train = []
-        X_val = []
-        y_val = []
+        X_train_1 = []
+        y_train_1 = []
+        X_train_0 = []
+        y_train_0 = []
+        X_val_1 = []
+        y_val_1 = []
+        X_val_0 = []
+        y_val_0 = []
         for line in open(self.train_dir, "r"):  # train data
             line = line.rstrip("\n")
             label, items = line.split(' ', 1)
@@ -93,8 +100,12 @@ class polyvore_dataset:
                             x1 = set_id_to_item_id_train[set_id][int(index) - 1]
                             set_id, index = this_comp_items[j][0], this_comp_items[j][1]
                             x2 = set_id_to_item_id_train[set_id][int(index) - 1]
-                            X_train.append([x1, x2])
-                            y_train.append(int(label))
+                            if label == '1':
+                                X_train_1.append([x1, x2])
+                                # y_train_1.append(int(label))
+                            else:
+                                X_train_0.append([x1, x2])
+                                # y_train_0.append(int(label))
                         j += 1
                     i += 1
 
@@ -118,10 +129,33 @@ class polyvore_dataset:
                             x1 = set_id_to_item_id_valid[set_id][int(index)-1]
                             set_id, index = this_comp_items[j][0], this_comp_items[j][1]
                             x2 = set_id_to_item_id_valid[set_id][int(index)-1]
-                            X_val.append([x1, x2])
-                            y_val.append(int(label))
+                            if label == '1':
+                                X_val_1.append([x1, x2])
+                                # y_val_1.append(int(label))
+                            else:
+                                X_val_0.append([x1, x2])
+                                # y_val_0.append(int(label))
                         j += 1
                     i += 1
+
+        X_train = []
+        y_train = []
+        X_val = []
+        y_val = []
+        i = 0
+        while i < TRAIN_SIZE // 2:
+            X_train.append(X_train_1[i])
+            X_train.append(X_train_0[i])
+            y_train.append(1)
+            y_train.append(0)
+            i += 1
+        i = 0
+        while i < VAL_SIZE // 2:
+            X_val.append(X_val_1[i])
+            X_val.append(X_val_0[i])
+            y_val.append(1)
+            y_val.append(0)
+            i += 1
 
 
         print('len of train: {}, # len of val: {}'.format(len(y_train), len(y_val)))
