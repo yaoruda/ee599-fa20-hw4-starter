@@ -51,7 +51,7 @@ if __name__=='__main__':
         # define optimizers
         model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.summary()
+    model.summary_model()
 
     # training
     model.fit_generator(generator=train_generator,

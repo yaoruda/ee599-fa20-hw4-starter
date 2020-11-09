@@ -1,18 +1,9 @@
-from torchvision.models import resnet50, resnet34
 import torch.nn.functional as F
 import torch.nn as nn
-from utils import local, Config
 
-
-if local:
-    torch_model = resnet50(pretrained=Config['finetune'])
-else:
-    torch_model = resnet34(pretrained=Config['finetune'])
-
-
-class Ruda_Model(nn.Module):
+class Model(nn.Module):
     def __init__(self):
-        super(Ruda_Model, self).__init__()
+        super(Model, self).__init__()
 
         self.conv1_1 = nn.Conv2d(6, 64, 3, bias=False)
         self.conv1_2 = nn.Conv2d(64, 64, 3, bias=False)
@@ -94,38 +85,9 @@ class Ruda_Model(nn.Module):
         out = F.relu(out)
         out = self.dropout(out)
 
-        # print(out.shape)
         out = out.view(-1, 1024 * 4 * 4)
         out = self.fc1(out)
         out = self.fc2(out)
         return out
 
-
-class pairwise_1_backup(nn.Module):
-    def __init__(self):
-        super(pairwise_1_backup, self).__init__()
-
-        self.conv1_1 = nn.Conv2d(6, 48, 3, stride=4, bias=False)
-        self.conv1_2 = nn.Conv2d(48, 96, 3, stride=4, bias=False)
-        self.bn1_1 = nn.BatchNorm2d(48)
-        self.bn1_2 = nn.BatchNorm2d(96)
-        self.pool1 = nn.MaxPool2d(kernel_size=2, dilation=2)
-        self.dropout = nn.Dropout2d(0.1)
-        self.fc1 = nn.Linear(96 * 6 * 6, 512)
-        self.fc2 = nn.Linear(512, 1)
-
-    def forward(self, x):
-        out = x
-        out = self.conv1_1(out)
-        out = self.bn1_1(out)
-        out = self.conv1_2(out)
-        out = self.bn1_2(out)
-        out = self.pool1(out)
-        out = F.relu(out)
-        out = self.dropout(out)
-        out = out.view(-1, 96 * 6 * 6)
-        out = self.fc1(out)
-        out = self.fc2(out)
-        return out
-
-# model = Ruda_Model()
+# model = Model()

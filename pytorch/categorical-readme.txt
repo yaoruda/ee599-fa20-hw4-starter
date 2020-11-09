@@ -1,0 +1,1 @@
+"categorical-model.pth" is based on ResNet34.

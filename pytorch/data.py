@@ -1,7 +1,3 @@
-import torch
-import torch as th
-import torch.nn as nn
-import torch.nn.functional as F
 from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 
@@ -9,7 +5,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 import os
-import numpy as np
 import os.path as osp
 import json
 from tqdm import tqdm
@@ -24,10 +19,6 @@ class polyvore_dataset:
         self.image_dir = osp.join(self.root_dir, 'images')
         self.transforms = self.get_data_transforms()
         self.labels = LabelEncoder()
-        # self.y = self.labels.fit_transform(self.y)
-        # self.X_train, self.X_test, self.y_train, self.y_test, self.classes = self.create_dataset()
-
-
 
     def get_data_transforms(self):
         data_transforms = {
@@ -130,10 +121,4 @@ def get_dataloader(debug, batch_size, num_workers):
                                  num_workers=num_workers)
                                  for x in ['train', 'test']}
     return dataloaders, classes, dataset_size, dataset
-
-
-
-
-########################################################################
-# For Pairwise Compatibility Classification
 

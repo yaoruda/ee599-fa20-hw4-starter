@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torchsummary import summary
 
-import argparse
 import time
 import copy
 from tqdm import tqdm
@@ -59,14 +58,11 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
                 with torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     labels = labels.unsqueeze(1).double()
-                    # _, pred = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
 
-                # running_loss += loss.item() * inputs.size(0)
-                # running_corrects += torch.sum(pred == labels.data)
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(torch.eq(outputs > 0, labels).long())
 
@@ -97,20 +93,13 @@ def train_model(dataloader, model, criterion, optimizer, device, num_epochs, dat
     print('Time taken to complete training: {:0f}m {:0f}s'.format(time_elapsed // 60, time_elapsed % 60))
     print('Best acc: {:.4f}'.format(best_acc))
 
-
 if __name__ == '__main__':
-
     dataloaders, dataset_size, dataset = get_dataloader(debug=Config['debug'], batch_size=Config['batch_size'],
                                                         num_workers=Config['num_workers'])
-
     model = Ruda_Model()
-
-
-    # print(model)
     device = torch.device('cuda:0' if torch.cuda.is_available() and Config['use_cuda'] else 'cpu')
     model.to(device)
     summary(model, input_size=(6, 224, 224))
-
 
     if Config['half_finetune']:
         # freeze the ResNet34 layers
@@ -123,7 +112,6 @@ if __name__ == '__main__':
 
     criterion = nn.BCEWithLogitsLoss()
     optimizer = optim.RMSprop(model.parameters(), lr=Config['learning_rate'])
-
 
     if torch.cuda.is_available():
         print("USE GPU")

@@ -37,7 +37,6 @@ class Ruda_Model(nn.Module):
         self.conv4_2 = nn.Conv2d(384, 384, 3, padding=1)
         self.bn4_1 = nn.BatchNorm2d(384)
         self.bn4_2 = nn.BatchNorm2d(384)
-        # self.pool4 = nn.MaxPool2d(kernel_size=2, dilation=2)
         self.pool4 = nn.MaxPool2d(kernel_size=2)
 
         self.conv5_1 = nn.Conv2d(384, 256, 3, padding=1)
@@ -45,7 +44,6 @@ class Ruda_Model(nn.Module):
         self.bn5_1 = nn.BatchNorm2d(256)
         self.bn5_2 = nn.BatchNorm2d(256)
         self.pool5 = nn.MaxPool2d(kernel_size=2, dilation=2)
-        # self.pool5 = nn.MaxPool2d(kernel_size=2)
 
         self.dropout_conv = nn.Dropout2d(0.1)
         self.dropout_fc = nn.Dropout2d(0.5)
@@ -56,10 +54,6 @@ class Ruda_Model(nn.Module):
 
     def forward(self, x):
         out = x
-
-        # handle single images
-        if (len(out.shape) == 3):
-            out = out.unsqueeze(0)
 
         out = self.conv1_1(out)
         out = self.bn1_1(out)
@@ -101,11 +95,8 @@ class Ruda_Model(nn.Module):
         out = F.relu(out)
         out = self.dropout_conv(out)
 
-        # flatten
         # print(out.shape)
         out = out.view(-1, 256 * 6 * 6)
-
-
 
         out = self.fc1(out)
         out = self.dropout_fc(out)
@@ -113,5 +104,4 @@ class Ruda_Model(nn.Module):
         out = self.dropout_fc(out)
         out = self.fc3(out)
 
-        # out = F.sigmoid(out)
         return out

@@ -1,20 +1,9 @@
 import torch
-import torch as th
-import torch.nn as nn
-import torch.nn.functional as F
 from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-
-import os
-import numpy as np
 import os.path as osp
 import json
-from tqdm import tqdm
 from PIL import Image
-
 from utils import Config
 
 TRAIN_SIZE = 100000
@@ -30,11 +19,6 @@ class polyvore_dataset:
         self.train_json = osp.join(self.root_dir, 'train.json')
         self.valid_json = osp.join(self.root_dir, 'valid.json')
         self.transforms = self.get_data_transforms()
-        # self.labels = LabelEncoder()
-        # self.y = self.labels.fit_transform(self.y)
-        # self.X_train, self.X_test, self.y_train, self.y_test, self.classes = self.create_dataset()
-
-
 
     def get_data_transforms(self):
         data_transforms = {
@@ -51,8 +35,6 @@ class polyvore_dataset:
             ]),
         }
         return data_transforms
-
-
 
     def create_dataset(self):
         # train_json
@@ -73,13 +55,9 @@ class polyvore_dataset:
                 set_id_to_item_id_valid[set['set_id']].append(item['item_id'])
 
         X_train_1 = []
-        y_train_1 = []
         X_train_0 = []
-        y_train_0 = []
         X_val_1 = []
-        y_val_1 = []
         X_val_0 = []
-        y_val_0 = []
         for line in open(self.train_dir, "r"):  # train data
             line = line.rstrip("\n")
             label, items = line.split(' ', 1)
@@ -102,10 +80,8 @@ class polyvore_dataset:
                             x2 = set_id_to_item_id_train[set_id][int(index) - 1]
                             if label == '1':
                                 X_train_1.append([x1, x2])
-                                # y_train_1.append(int(label))
                             else:
                                 X_train_0.append([x1, x2])
-                                # y_train_0.append(int(label))
                         j += 1
                     i += 1
 
@@ -131,10 +107,8 @@ class polyvore_dataset:
                             x2 = set_id_to_item_id_valid[set_id][int(index)-1]
                             if label == '1':
                                 X_val_1.append([x1, x2])
-                                # y_val_1.append(int(label))
                             else:
                                 X_val_0.append([x1, x2])
-                                # y_val_0.append(int(label))
                         j += 1
                     i += 1
 
@@ -223,4 +197,3 @@ def get_dataloader(debug, batch_size, num_workers):
                                  batch_size=batch_size)
                                  for x in ['train', 'test']}
     return dataloaders, dataset_size, dataset
-

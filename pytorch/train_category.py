@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torchsummary import summary
 
-import argparse
 import time
 import copy
 from tqdm import tqdm

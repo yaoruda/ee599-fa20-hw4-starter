@@ -6,12 +6,12 @@ import argparse
 
 Config ={}
 
-local = False
+local = True
 TX = True
-Config['debug'] = False
-Config['finetune'] = True
+Config['debug'] = True
+Config['finetune'] = False
 Config['half_finetune'] = False
-Config['ruda_model'] = False
+Config['ruda_model'] = True
 
 Config['num_epochs'] = 30
 Config['batch_size'] = 512
